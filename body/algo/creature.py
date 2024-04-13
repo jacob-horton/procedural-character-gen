@@ -63,10 +63,11 @@ class Creature:
         self.RANDOM_STATE = random.Random(self.SEED)
         self.blobs: list[Blob] = []
         self.parent_offset = parent_offset
+        self.color = pygame.Color(random.randrange(256), random.randrange(256), random.randrange(256))
 
     def create_blob(self, parent_offset: Vector3, n: int = 20, initial_distance: int = 10, growth_rate: float = 10, repulsion: float = 1):
         points = self.make_points(n, initial_distance)
-        self.blobs.append(Blob(parent_offset, points, growth_rate, repulsion))
+        self.blobs.append(Blob(parent_offset, points, growth_rate, repulsion, color=self.color + pygame.Color(random.randrange(50), random.randrange(50), random.randrange(50))))
 
     # generate nodes close by randomly
     def make_points(self, n: int, initial_distance: int):
