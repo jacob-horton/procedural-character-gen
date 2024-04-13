@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 def get_top_most(points: np.ndarray) -> np.ndarray:
     max_y = points[0][1]
@@ -53,25 +52,3 @@ def gift_wrap(points: np.ndarray) -> np.ndarray:
         current = max_point
 
     return np.array(hull[:-1])
-
-
-points = np.array([
-    [0, 5],
-    [0.5, 3.5],
-    [2, 5.5],
-    [2, 4],
-    [2.5, 2.5],
-    [2, 0],
-    [3.5, 4.5],
-    [3.5, 3.5],
-    [5.5, 2],
-    [5.5, 5],
-])
-hull = gift_wrap(points)
-
-
-
-plt.scatter(points.swapaxes(0,1)[0], points.swapaxes(0,1)[1])
-plt.plot(hull.swapaxes(0,1)[0], hull.swapaxes(0,1)[1])
-plt.show()
-

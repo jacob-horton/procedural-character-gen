@@ -3,19 +3,6 @@ import random
 import numpy as np
 from typing import Any
 
-# Returns array of points
-def circle_randomiser_body_generator(radius: float, variability: float, n_points: int = 16) -> np.ndarray:
-    noise = PerlinNoise(octaves=2, seed=random.randrange(1000))
-
-    points = np.zeros(n_points)
-    for i in range(n_points):
-        frac = float(i) / float(n_points)
-        mag = radius + variability * noise(frac)
-        angle = frac * 2 * np.pi
-        points[i] = np.ones(4)
-    
-    pass
-
 class GrowthGenerator:
     def __init__(self, root: Any, n: int = 3, seed: Any = None, initial_distance: int = 10):
         self.SEED = seed
