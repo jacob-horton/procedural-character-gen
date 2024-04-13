@@ -1,6 +1,9 @@
 import numpy as np
+from typing import Any
 
-def project_point(point: np.ndarray, transformation_matrix: np.ndarray):
+NDArray = np.ndarray[float, np.dtype[Any]]
+
+def project_point(point: NDArray, transformation_matrix: NDArray):
     left = -2
     right = 2
     bottom = -2
@@ -50,7 +53,7 @@ def project_point(point: np.ndarray, transformation_matrix: np.ndarray):
     return projected[:2]
 
 
-def generate_transformation_matrix(scale_factor: int, rotation: np.ndarray, translation: np.ndarray):
+def generate_transformation_matrix(scale_factor: int, rotation: NDArray, translation: NDArray):
     translation_matrix = np.array([
         [1,0,0,translation[0]],
         [0,1,0,translation[1]],
@@ -90,6 +93,6 @@ def generate_transformation_matrix(scale_factor: int, rotation: np.ndarray, tran
 
 
 predefined_transform_matrix = generate_transformation_matrix(1, np.array([np.radians(20), np.radians(45), 0]), np.zeros(3))
-def predefined_projection(point: np.ndarray):
+def predefined_projection(point: NDArray):
     return project_point(point, predefined_transform_matrix)
     

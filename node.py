@@ -19,6 +19,13 @@ class Node:
         projected = predefined_projection(np.array([self.x, self.y, self.z]))
 
         return [projected[0], projected[1]]
+    
+    def ortho_heat(self):
+        if self.z > 0:
+            color = pygame.Color(max(0, min(int(self.z), 255)), 0, 0, 0)
+        else:
+            color = pygame.Color(0, max(0, min(int(abs(self.z)), 255)), 0, 0)
+        return ((self.x, self.y), color)
 
 @dataclass
 class Circle:
@@ -27,4 +34,5 @@ class Circle:
     radius: float
 
     def draw(self, screen: pygame.Surface, color: pygame.Color | str = "black"):
-        pygame.draw.circle(screen, color, self.node.project(), self.radius)
+        p, c = self.node.ortho_heat()
+        pygame.draw.circle(screen, c, p, self.radius)
