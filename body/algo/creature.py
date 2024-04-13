@@ -7,9 +7,11 @@ from body.algo.gift_wrapping import gift_wrap
 from body.algo.projection import predefined_projection
 
 class Blob:
-    def __init__(self, pos: Vector3, points: list[Vector3]):
+    def __init__(self, pos: Vector3, points: list[Vector3], growth_rate: float, repulsion: float):
         self.pos = pos
         self.points = points
+        self.repulsion = repulsion
+        self.growth_rate = growth_rate
 
     def draw(self, screen: pygame.Surface, color: pygame.Color):
         projected = [predefined_projection(p + self.pos) for p in self.points]
@@ -30,9 +32,9 @@ class Creature:
         self.RANDOM_STATE = random.Random(self.SEED)
         self.blobs: list[Blob] = []
 
-    def create_blob(self, pos: Vector3, n: int = 20, initial_distance: int = 10):
+    def create_blob(self, pos: Vector3, n: int = 20, initial_distance: int = 10, growth_rate: float = 10, repulsion: float = 1):
         points = self.make_points(n, initial_distance)
-        self.blobs.append(Blob(pos, points))
+        self.blobs.append(Blob(pos, points, growth_rate, repulsion))
 
     # generate nodes close by randomly
     def make_points(self, n: int, initial_distance: int):
@@ -51,7 +53,7 @@ class Creature:
         point_list = [mk_pt() for _ in range(n)]
         return point_list
 
-    def grow(self, rate: float = 10, repulsion: float = 0.1):
+    def grow(self):
         # Loop through all blobs to grow them
         for blob in self.blobs:
             for point in blob.points:
@@ -65,7 +67,7 @@ class Creature:
                 3. Hope that translates well.
                 '''
                 # move further
-                movement_vec = point.copy()
+                movement_vec = point + blob.pos
                 # find the vector from this to the nearest neighbouring node
                 nearest_neighbour_vector = None
                 for other_blob in self.blobs:
@@ -74,7 +76,7 @@ class Creature:
                         if point == neighbour: continue
 
                         if nearest_neighbour_vector is None:
-                            nearest_neighbour_vector = point - neighbour
+                            nearest_neighbour_vector = point + neighbour
                             continue
 
                         neighbour_vector = point - neighbour
@@ -85,8 +87,8 @@ class Creature:
                     raise Exception("nearest neighbour was none")
 
                 # add the movement vector to a weighted nearest neighbour vector (nnv)
-                movement_vec += nearest_neighbour_vector * repulsion
-                point += movement_vec.normalize() * rate
+                movement_vec += nearest_neighbour_vector * blob.repulsion
+                point += movement_vec.normalize() * blob.growth_rate
 
     def render(self, screen: Surface):
         for blob in self.blobs:
