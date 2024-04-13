@@ -1,9 +1,10 @@
 import numpy as np
 from typing import Any
+from pygame import Vector2, Vector3
 
 NDArray = np.ndarray[float, np.dtype[Any]]
 
-def project_point(point: NDArray, transformation_matrix: NDArray):
+def project_point(point: Vector3, transformation_matrix: NDArray) -> Vector2:
     left = -2
     right = 2
     bottom = -2
@@ -47,17 +48,17 @@ def project_point(point: NDArray, transformation_matrix: NDArray):
         ]
     )
 
-    point4d = np.append(point, 1)
+    point4d = np.append(np.array(point), 1)
     projected = convert_to_left_handed @ scale_matrix @ centre_matrix @ transformation_matrix @ point4d
 
-    return projected[:2]
+    return Vector2(projected[0], projected[1])
 
 
-def generate_transformation_matrix(scale_factor: int, rotation: NDArray, translation: NDArray):
+def generate_transformation_matrix(scale_factor: int, rotation: Vector3, translation: Vector3) -> NDArray:
     translation_matrix = np.array([
-        [1,0,0,translation[0]],
-        [0,1,0,translation[1]],
-        [0,0,1,translation[2]],
+        [1,0,0,translation.x],
+        [0,1,0,translation.y],
+        [0,0,1,translation.z],
         [0,0,0,1],
     ])
 
@@ -70,21 +71,21 @@ def generate_transformation_matrix(scale_factor: int, rotation: NDArray, transla
 
     x_rot = np.array([
         [1, 0, 0, 0],
-        [0, np.cos(rotation[0]), np.sin(rotation[0]), 0],
-        [0, -np.sin(rotation[0]), np.cos(rotation[0]), 0],
+        [0, np.cos(rotation.x), np.sin(rotation.x), 0],
+        [0, -np.sin(rotation.x), np.cos(rotation.x), 0],
         [0, 0, 0, 1],
     ])
 
     y_rot = np.array([
-        [np.cos(rotation[1]), 0, -np.sin(rotation[1]), 0],
+        [np.cos(rotation.y), 0, -np.sin(rotation.y), 0],
         [0, 1, 0, 0],
-        [np.sin(rotation[1]), 0, np.cos(rotation[1]), 0],
+        [np.sin(rotation.y), 0, np.cos(rotation.y), 0],
         [0, 0, 0, 1],
     ])
 
     z_rot = np.array([
-        [np.cos(rotation[0]), -np.sin(rotation[0]), 0, 0],
-        [np.sin(rotation[0]), np.cos(rotation[0]), 0, 0],
+        [np.cos(rotation.z), -np.sin(rotation.z), 0, 0],
+        [np.sin(rotation.z), np.cos(rotation.z), 0, 0],
         [0, 0, 1, 0],
         [0, 0, 0, 1],
     ])
@@ -92,7 +93,8 @@ def generate_transformation_matrix(scale_factor: int, rotation: NDArray, transla
     return scaling_matrix @ translation_matrix @ x_rot @ y_rot @ z_rot
 
 
-predefined_transform_matrix = generate_transformation_matrix(1, np.array([np.radians(20), np.radians(45), 0]), np.zeros(3))
-def predefined_projection(point: NDArray):
+predefined_transform_matrix = generate_transformation_matrix(1, Vector3(np.radians(20), np.radians(45), 0), Vector3())
+
+def predefined_projection(point: Vector3) -> Vector2:
     return project_point(point, predefined_transform_matrix)
     

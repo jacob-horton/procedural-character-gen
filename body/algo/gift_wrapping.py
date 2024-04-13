@@ -1,12 +1,12 @@
-import numpy as np
+from pygame import Vector2 
 
-def get_top_most(points: np.ndarray) -> np.ndarray:
-    max_y = points[0][1]
+def get_top_most(points: list[Vector2]) -> Vector2:
+    max_y = points[0].y
     top_most = points[0]
 
     for point in points[1:]:
-        if point[1] > max_y:
-            max_y = point[1]
+        if point.y > max_y:
+            max_y = point.y
             top_most = point
 
 
@@ -14,14 +14,14 @@ def get_top_most(points: np.ndarray) -> np.ndarray:
 
 
 # Points = array of (x, y)
-def gift_wrap(points: np.ndarray) -> np.ndarray:
+def gift_wrap(points: list[Vector2]) -> list[Vector2]:
     current = get_top_most(points)
     hull = [current]
-    prev_diff = np.array([1, 0])
+    prev_diff = Vector2(1, 0)
 
     # Loop until we get back to start
     while True:
-        if len(hull) > 1 and np.array_equal(current, hull[0]):
+        if len(hull) > 1 and current == hull[0]:
             break
 
         # Max dot product = min angle between the vectors
@@ -30,12 +30,14 @@ def gift_wrap(points: np.ndarray) -> np.ndarray:
 
         for point in points:
             # Skip if checking against itself
-            if any([np.array_equal(p, point) for p in hull[1:]]):
+            if any([p == point for p in hull[1:]]) or point == current:
                 continue
 
-            diff = point - current
-            diff /= np.linalg.norm(diff)
-            dot = np.dot(diff, prev_diff)
+            print(hull)
+            print(current)
+            print(point)
+            diff = (point - current).normalize()
+            dot = diff.dot(prev_diff)
 
             if max_dot is None or dot > max_dot:
                 max_dot = dot
@@ -45,10 +47,11 @@ def gift_wrap(points: np.ndarray) -> np.ndarray:
             print("UH OH")
             exit(1)
             
+        print('here')
         prev_diff = max_point - hull[-1]
-        prev_diff /= np.linalg.norm(prev_diff)
+        prev_diff /= prev_diff.magnitude()
 
         hull.append(max_point)
         current = max_point
 
-    return np.array(hull[:-1])
+    return hull[:-1]

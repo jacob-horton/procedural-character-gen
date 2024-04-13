@@ -1,11 +1,11 @@
 # from perlin_noise import PerlinNoise
 import random
-import numpy as np
 from typing import Any
-from body.node import Node
+
+from pygame import Vector3
 
 class RootNode:
-    def __init__(self, node: Node, gg: 'GrowthGenerator', n: int = 3, initial_distance: int = 10):
+    def __init__(self, node: Vector3, gg: 'GrowthGenerator', n: int = 3, initial_distance: int = 10):
         self.gg = gg
         self.pos = (node.x, node.y, node.z)
         self.points = gg.make_points(self, n, initial_distance)
@@ -15,30 +15,28 @@ class GrowthGenerator:
     def __init__(self, seed: Any = None):
         self.SEED = seed
         self.RANDOM_STATE = random.Random(self.SEED)
-        self.points: list[Any] = []
+        self.points: list[Vector3] = []
 
     # generate nodes close by randomly
     def make_points(self, root: RootNode, n: int, initial_distance: int):
         def mk_pt():
             r = []
             for i in range(3):
-                print(i, root.pos[i])
                 # from [-1, 1)
                 x = (self.RANDOM_STATE.random()*2-1)
                 # from [-10, 10)
                 x *= initial_distance
                 # offset to root +- 10
                 x += root.pos[i]
-                print(x)
                 r.append(x)
-            return np.array(r)
+
+            return Vector3(r)
         
-        point_list = np.array([mk_pt() for _ in range(n)])
-        print(point_list)
-        self.points += list(point_list)
+        point_list = [mk_pt() for _ in range(n)]
+        self.points += point_list
         return point_list
 
-    def grow(self, rate: int = 10, repulsion: float = 0.1):
+    def grow(self, rate: float = 10, repulsion: float = 0.1):
         print('GROW')
         for index, point in enumerate(self.points):
             '''
@@ -51,21 +49,23 @@ class GrowthGenerator:
             3. Hope that translates well.
             '''
             # move further
-            movement_vec = np.array(point, dtype=float)
-            print(f'{index=}, {movement_vec=}')
+            movement_vec = point.copy()
             # find the vector from this to the nearest neighbouring node
             nearest_neighbour_vector = None
             for neighbour in self.points:
-                if np.array_equal(point, neighbour): continue
+                if point == neighbour: continue
+
                 if nearest_neighbour_vector is None:
                     nearest_neighbour_vector = point - neighbour
                     continue
+
                 neighbour_vector = point - neighbour
-                if np.linalg.norm(neighbour_vector) < np.linalg.norm(nearest_neighbour_vector):
+                if neighbour_vector.magnitude_squared() < nearest_neighbour_vector.magnitude_squared():
                     nearest_neighbour_vector = neighbour_vector
+
             if nearest_neighbour_vector is None:
                 raise Exception("nearest neighbour was none")
+
             # add the movement vector to a weighted nearest neighbour vector (nnv)
             movement_vec += nearest_neighbour_vector * repulsion
-            print(f'{movement_vec=}')
-            self.points[index] = point + (movement_vec/np.linalg.norm(movement_vec)) * rate
+            self.points[index] = point + (movement_vec.normalize()) * rate
