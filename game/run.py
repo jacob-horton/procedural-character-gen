@@ -21,7 +21,7 @@ def run(screen: pygame.Surface, clock: pygame.time.Clock, render: Callable[..., 
                     space = True
 
         background(screen)
-        render(space)
+        render(screen, space)
 
         pygame.display.flip()
         clock.tick(FPS)

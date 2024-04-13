@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import pygame
 import numpy as np
 
-from projection import predefined_projection
+from body.algo.projection import predefined_projection
 
 RESOLUTION = (1280, 720)
 center = (RESOLUTION[0]/2, RESOLUTION[1]/2)
