@@ -2,9 +2,9 @@
 the main script
 '''
 import pygame
+from game.config import RESOLUTION
 from game.run import run
 from game.render_update import render
-from body.node import RESOLUTION
 
 # pygame setup
 pygame.init()

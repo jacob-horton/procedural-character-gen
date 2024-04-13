@@ -2,15 +2,17 @@ import numpy as np
 from typing import Any
 from pygame import Vector2, Vector3
 
+from game.config import RESOLUTION
+
 NDArray = np.ndarray[float, np.dtype[Any]]
 
 def project_point(point: Vector3, transformation_matrix: NDArray) -> Vector2:
-    left = -2
-    right = 2
-    bottom = -2
-    up = 2
+    bottom = -100
+    up = 100
+    left = bottom * RESOLUTION.x / RESOLUTION.y
+    right = up * RESOLUTION.x / RESOLUTION.y
     near = 0
-    far = 4
+    far = 200
 
 
     mid_x = (left + right) / 2
@@ -51,7 +53,8 @@ def project_point(point: Vector3, transformation_matrix: NDArray) -> Vector2:
     point4d = np.append(np.array(point), 1)
     projected = convert_to_left_handed @ scale_matrix @ centre_matrix @ transformation_matrix @ point4d
 
-    return Vector2(projected[0], projected[1])
+    # Convert to 
+    return Vector2((projected[0]+1)*RESOLUTION.x/2, (projected[1]+1)*RESOLUTION.y/2)
 
 
 def generate_transformation_matrix(scale_factor: int, rotation: Vector3, translation: Vector3) -> NDArray:
