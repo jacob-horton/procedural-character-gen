@@ -12,8 +12,8 @@ class Segment:
     end: Vector3
     width: int
 
-    def draw(self, screen: pygame.Surface, color: pygame.Color | str = "black"):
+    def draw(self, screen: pygame.Surface, global_offset: Vector3, color: pygame.Color | str = "black"):
         # TODO: cap the ends
-        start = predefined_projection(self.start)
-        end = predefined_projection(self.end)
+        start = predefined_projection(self.start + global_offset)
+        end = predefined_projection(self.end + global_offset)
         pygame.draw.line(screen, color, start, end, self.width)

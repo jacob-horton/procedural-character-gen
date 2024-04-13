@@ -7,11 +7,11 @@ from body.algo.projection import predefined_projection
 
 @dataclass
 class Eye:
-    pos: Vector3
+    parent_offset: Vector3
     radius: float
 
-    def draw(self, screen: pygame.Surface):
-        projected = predefined_projection(self.pos)
+    def draw(self, screen: pygame.Surface, global_offset: Vector3):
+        projected = predefined_projection(self.parent_offset + global_offset)
 
         pygame.draw.circle(
             screen,
