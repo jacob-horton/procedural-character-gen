@@ -33,9 +33,6 @@ def gift_wrap(points: list[Vector2]) -> list[Vector2]:
             if any([p == point for p in hull[1:]]) or point == current:
                 continue
 
-            print(hull)
-            print(current)
-            print(point)
             diff = (point - current).normalize()
             dot = diff.dot(prev_diff)
 
@@ -47,7 +44,6 @@ def gift_wrap(points: list[Vector2]) -> list[Vector2]:
             print("UH OH")
             exit(1)
             
-        print('here')
         prev_diff = max_point - hull[-1]
         prev_diff /= prev_diff.magnitude()
 

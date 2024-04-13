@@ -4,21 +4,21 @@ from typing import Any
 
 from pygame import Vector3
 
-class RootNode:
-    def __init__(self, node: Vector3, gg: 'GrowthGenerator', n: int = 3, initial_distance: int = 10):
+class Blob:
+    def __init__(self, node: Vector3, gg: 'Creature', n: int = 3, initial_distance: int = 10):
         self.gg = gg
         self.pos = (node.x, node.y, node.z)
         self.points = gg.make_points(self, n, initial_distance)
 
 
-class GrowthGenerator:
+class Creature:
     def __init__(self, seed: Any = None):
         self.SEED = seed
         self.RANDOM_STATE = random.Random(self.SEED)
         self.points: list[Vector3] = []
 
     # generate nodes close by randomly
-    def make_points(self, root: RootNode, n: int, initial_distance: int):
+    def make_points(self, root: Blob, n: int, initial_distance: int):
         def mk_pt():
             r = []
             for i in range(3):
@@ -37,7 +37,6 @@ class GrowthGenerator:
         return point_list
 
     def grow(self, rate: float = 10, repulsion: float = 0.1):
-        print('GROW')
         for index, point in enumerate(self.points):
             '''
             Each of the nodes can be considered a vector from (0,0,0), which is the root node.
@@ -68,4 +67,4 @@ class GrowthGenerator:
 
             # add the movement vector to a weighted nearest neighbour vector (nnv)
             movement_vec += nearest_neighbour_vector * repulsion
-            self.points[index] = point + (movement_vec.normalize()) * rate
+            point += (movement_vec.normalize()) * rate
