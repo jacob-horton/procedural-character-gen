@@ -5,20 +5,18 @@ import numpy as np
 
 from body.algo.projection import predefined_projection
 
-RESOLUTION = (1280, 720)
-center = (RESOLUTION[0]/2, RESOLUTION[1]/2)
+RESOLUTION = (32, 32)
 
 class Node:
     def __init__(self, x: float, y: float, z: float):
-        self.x = x + center[0]
-        self.y = y + center[1]
+        self.x = x
+        self.y = y
         self.z = z
 
     # replace
     def project(self):
-        projected = predefined_projection(np.array([self.x, self.y, self.z]))
+        return predefined_projection(np.array([self.x, self.y, self.z]))
 
-        return [projected[0], projected[1]]
     
     def ortho_heat(self):
         if self.z > 0:
@@ -31,8 +29,10 @@ class Node:
 class Circle:
     # do better w subclass
     node: Node
+    translation: np.ndarray
     radius: float
 
     def draw(self, screen: pygame.Surface, color: pygame.Color | str = "black"):
-        p, c = self.node.ortho_heat()
-        pygame.draw.circle(screen, c, p, self.radius)
+        # p, c = self.node.ortho_heat()
+        point = self.node.project()
+        pygame.draw.circle(screen, color, list(point + self.translation), self.radius)
