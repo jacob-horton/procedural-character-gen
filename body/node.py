@@ -5,7 +5,7 @@ import numpy as np
 
 from body.algo.projection import predefined_projection
 
-RESOLUTION = (32, 32)
+RESOLUTION = (1280, 720)
 
 class Node:
     def __init__(self, x: float, y: float, z: float):

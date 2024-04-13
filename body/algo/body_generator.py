@@ -2,17 +2,45 @@
 import random
 import numpy as np
 from typing import Any
+from body.node import Node
+
+class RootNode:
+    def __init__(self, node: Node, gg: 'GrowthGenerator', n: int = 3, initial_distance: int = 10):
+        self.gg = gg
+        self.pos = (node.x, node.y, node.z)
+        self.points = gg.make_points(self, n, initial_distance)
+
 
 class GrowthGenerator:
-    def __init__(self, root: Any, n: int = 3, seed: Any = None, initial_distance: int = 10):
+    def __init__(self, seed: Any = None):
         self.SEED = seed
         self.RANDOM_STATE = random.Random(self.SEED)
-        # generate nodes close by randomly
-        r = lambda: np.array([round((self.RANDOM_STATE.random()*2-1)*initial_distance) for _ in range(3)]) 
-        self.point_list = [r() for _ in range(n)]
+        self.points: list[Any] = []
+
+    # generate nodes close by randomly
+    def make_points(self, root: RootNode, n: int, initial_distance: int):
+        def mk_pt():
+            r = []
+            for i in range(3):
+                print(i, root.pos[i])
+                # from [-1, 1)
+                x = (self.RANDOM_STATE.random()*2-1)
+                # from [-10, 10)
+                x *= initial_distance
+                # offset to root +- 10
+                x += root.pos[i]
+                print(x)
+                r.append(x)
+            return np.array(r)
+        
+        point_list = np.array([mk_pt() for _ in range(n)])
+        print(point_list)
+        self.points += list(point_list)
+        return point_list
 
     def grow(self, rate: int = 10, repulsion: float = 0.1):
-        for index, point in enumerate(self.point_list):
+        print('GROW')
+        for index, point in enumerate(self.points):
             '''
             Each of the nodes can be considered a vector from (0,0,0), which is the root node.
             We can increase the magnitude of this vector to make them further away, so we do this each step with mods:
@@ -27,7 +55,7 @@ class GrowthGenerator:
             print(f'{index=}, {movement_vec=}')
             # find the vector from this to the nearest neighbouring node
             nearest_neighbour_vector = None
-            for neighbour in self.point_list:
+            for neighbour in self.points:
                 if np.array_equal(point, neighbour): continue
                 if nearest_neighbour_vector is None:
                     nearest_neighbour_vector = point - neighbour
@@ -40,4 +68,4 @@ class GrowthGenerator:
             # add the movement vector to a weighted nearest neighbour vector (nnv)
             movement_vec += nearest_neighbour_vector * repulsion
             print(f'{movement_vec=}')
-            self.point_list[index] = point + (movement_vec/np.linalg.norm(movement_vec)) * rate
+            self.points[index] = point + (movement_vec/np.linalg.norm(movement_vec)) * rate
