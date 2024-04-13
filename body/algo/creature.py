@@ -1,33 +1,60 @@
 import random
 from typing import Any
 
-from pygame import Vector3, Surface
+from pygame import Vector2, Vector3, Surface
 import pygame
 from body.algo.gift_wrapping import gift_wrap
 from body.algo.projection import predefined_projection
 from body.eye import Eye
 
+def avg_vec3s(vecs: list[Vector3]) -> Vector3:
+    sum = Vector3()
+
+    for vec in vecs:
+        sum += vec
+
+    return sum / len(vecs)
+
+
+def avg_vec2s(vecs: list[Vector2]) -> Vector2:
+    sum = Vector2()
+
+    for vec in vecs:
+        sum += vec
+
+    return sum / len(vecs)
+
 class Blob:
-    def __init__(self, parent_offset: Vector3, points: list[Vector3], growth_rate: float, repulsion: float):
+    def __init__(self, parent_offset: Vector3, points: list[Vector3], growth_rate: float, repulsion: float, color: pygame.Color | None = None):
         self.parent_offset = parent_offset
         self.points = points
         self.repulsion = repulsion
         self.growth_rate = growth_rate
 
-    def draw(self, screen: pygame.Surface, global_offset: Vector3, color: pygame.Color):
+        if color is None:
+            color = pygame.Color(random.randrange(256), random.randrange(256), random.randrange(256))
+
+        self.color = color
+
+    def draw(self, screen: pygame.Surface, global_offset: Vector3):
         global_pos = global_offset + self.parent_offset
         projected = [predefined_projection(p + global_pos) for p in self.points]
         hull = gift_wrap(projected)
-        pygame.draw.polygon(
-            screen,
-            color,
-            hull,
-        )
+
+        avg = avg_vec2s(hull)
+
+        for i in range(len(hull)):
+            triangle = [avg, hull[i], hull[(i+1)%len(hull)]]
+            pygame.draw.polygon(
+                screen,
+                self.color + pygame.Color(i*10, i*10, i*10),
+                triangle,
+            )
 
         for point in projected:
             pygame.draw.circle(screen, "black", point, 5)
 
-        Eye(Vector3(), 20).draw(screen, global_pos)
+        Eye(avg_vec3s(self.points), 20).draw(screen, global_pos)
 
 
 class Creature:
@@ -97,4 +124,4 @@ class Creature:
 
     def render(self, screen: Surface, global_offset: Vector3):
         for blob in self.blobs:
-            blob.draw(screen, global_offset + self.parent_offset, pygame.Color(255,0,100))
+            blob.draw(screen, global_offset + self.parent_offset)
