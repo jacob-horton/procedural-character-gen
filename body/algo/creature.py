@@ -5,6 +5,7 @@ from pygame import Vector3, Surface
 import pygame
 from body.algo.gift_wrapping import gift_wrap
 from body.algo.projection import predefined_projection
+from body.eye import Eye
 
 class Blob:
     def __init__(self, pos: Vector3, points: list[Vector3], growth_rate: float, repulsion: float):
@@ -24,6 +25,8 @@ class Blob:
 
         for point in projected:
             pygame.draw.circle(screen, "black", point, 5)
+
+        Eye(self.pos, 20).draw(screen)
 
 
 class Creature:
