@@ -5,6 +5,7 @@ import pygame
 from pygame import Vector3
 from body.body import BodyPart
 from algo.projection import predefined_projection
+from graphics.line import draw_line
 
 
 @dataclass
@@ -19,10 +20,9 @@ class Segment:
         global_offset: Vector3,
         color: pygame.Color | str = "black",
     ):
-        # TODO: cap the ends
         start = predefined_projection(self.start + global_offset)
         end = predefined_projection(self.end + global_offset)
-        pygame.draw.line(screen, color, start, end, self.width)
+        draw_line(screen, color, start, end, self.width, end_scale=0.7)
 
 
 class Limb(BodyPart):
@@ -49,20 +49,6 @@ class Limb(BodyPart):
 
     def draw(self, screen: pygame.Surface, global_offset: Vector3):
         global_pos = global_offset + self.parent_offset
-
-        pygame.draw.circle(
-            screen,
-            self.color,
-            predefined_projection(self.parent_offset),
-            self.thickness / 2,
-        )
-
-        pygame.draw.circle(
-            screen,
-            self.color,
-            predefined_projection(self.parent_offset + self.points[0]),
-            self.thickness / 2,
-        )
 
         Segment(
             self.parent_offset, self.parent_offset + self.points[0], self.thickness

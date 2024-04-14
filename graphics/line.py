@@ -4,10 +4,10 @@ from pygame import Vector2
 
 def draw_line(
     screen: pygame.Surface,
+    color: pygame.Color | str,
     start: Vector2,
     end: Vector2,
     width: float,
-    color: pygame.Color,
     start_scale: float = 1.0,
     end_scale: float = 1.0,
 ):
