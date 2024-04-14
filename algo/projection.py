@@ -9,7 +9,7 @@ NDArray = np.ndarray[float, np.dtype[Any]]
 ROT = Vector3(20, 45, 0)
 
 
-def project_point(point: Vector3, transformation_matrix: NDArray) -> Vector2:
+def project_point(point: Vector3, transformation_matrix: NDArray) -> Vector3:
     scale = 2
     bottom = -100 * scale
     up = 100 * scale
@@ -63,9 +63,11 @@ def project_point(point: Vector3, transformation_matrix: NDArray) -> Vector2:
     )
 
     # Convert to
-    return Vector2(
-        (projected[0] + 1) * RESOLUTION.x / 2, (projected[1] + 1) * RESOLUTION.y / 2
-    )
+    return Vector3(*projected[:3])
+
+
+def to_screen_space(point: Vector3) -> Vector2:
+    return ((point.xy.elementwise() + 1).elementwise() * RESOLUTION.elementwise()) / 2
 
 
 def generate_transformation_matrix(
@@ -123,4 +125,11 @@ def predefined_projection(point: Vector3) -> Vector2:
     predefined_transform_matrix = generate_transformation_matrix(
         1, ROT * np.pi / 180, Vector3()
     )
-    return project_point(point, predefined_transform_matrix)
+    return to_screen_space(project_point(point, predefined_transform_matrix))
+
+
+def predefined_projection_depth(point: Vector3) -> float:
+    predefined_transform_matrix = generate_transformation_matrix(
+        1, ROT * np.pi / 180, Vector3()
+    )
+    return project_point(point, predefined_transform_matrix).z

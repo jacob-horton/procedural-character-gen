@@ -52,7 +52,10 @@ class Limb(BodyPart):
         p = distribute_points(1, angle_variation)[0]
         movement_vector = parent_offset.normalize() + p
         super().__init__(
-            gene, [movement_vector * initial_length], parent_offset, color=color
+            gene,
+            [movement_vector * initial_length],
+            parent_offset,
+            color=color,
         )
         self.append_to(parent)
 
@@ -63,12 +66,12 @@ class Limb(BodyPart):
         self.points[0] *= self.growth_rate
         self.growth_rate = 1 + ((self.growth_rate - 1) * 0.99)
 
-    def draw(self, screen: pygame.Surface, global_offset: Vector3):
+    def draw_self(self, screen: pygame.Surface, global_offset: Vector3):
         global_pos = global_offset + self.parent_offset
-
-        Segment(
-            self.parent_offset, self.parent_offset + self.points[0], self.thickness
-        ).draw(screen, global_offset, self.color)
-
-        for i in self.children:
-            i.draw(screen, global_pos)
+        draw_line(
+            screen,
+            self.color,
+            predefined_projection(global_pos),
+            predefined_projection(global_pos + self.points[0]),
+            self.thickness,
+        )

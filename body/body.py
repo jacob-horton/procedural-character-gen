@@ -1,8 +1,10 @@
+from queue import PriorityQueue
 import random
 from typing import Literal, NamedTuple
 import pygame
 from pygame import Vector3
 
+from algo.projection import predefined_projection_depth
 from body.gene import Gene
 
 SEED = None
@@ -37,4 +39,29 @@ class BodyPart:
         self, depth: int, all_children: list[tuple["BodyPart", int]]
     ) -> NewPart | None: ...
 
-    def draw(self, screen: pygame.Surface, global_offset: Vector3): ...
+    def draw(self, screen: pygame.Surface, global_offset: Vector3):
+        global_pos = global_offset + self.parent_offset
+        depth = predefined_projection_depth(global_pos)
+        queue = PriorityQueue()
+        queue.put((depth, self))
+
+        for i in self.children:
+            child_global_pos = global_pos + i.parent_offset
+            child_depth = predefined_projection_depth(child_global_pos)
+            queue.put((child_depth, i))
+
+        while queue.not_empty:
+            try:
+                item = queue.get(False)[1]
+            except:
+                break
+
+            if item is self:
+                self.draw_self(screen, global_offset)
+            else:
+                item.draw(screen, self.get_child_offset(global_offset))
+
+    def get_child_offset(self, global_offset: Vector3) -> Vector3:
+        return self.parent_offset + global_offset
+
+    def draw_self(self, screen: pygame.Surface, global_offset: Vector3): ...

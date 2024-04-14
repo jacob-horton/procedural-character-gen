@@ -95,11 +95,8 @@ class Blob(BodyPart):
             if gene.RANDOM.random() * 100 < chance:
                 return NewPart("Limb", point)
 
-    def draw(self, screen: pygame.Surface, global_offset: Vector3):
+    def draw_self(self, screen: pygame.Surface, global_offset: Vector3):
         global_pos = global_offset + self.parent_offset
-        for i in self.children:
-            i.draw(screen, global_pos)
-
         projected = [predefined_projection(p + global_pos) for p in self.points]
         hull = gift_wrap(projected)
 
