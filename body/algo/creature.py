@@ -163,6 +163,10 @@ class Creature:
                 movement_vec += nearest_neighbour_vector * bp.repulsion
                 point += movement_vec.normalize() * bp.growth_rate
 
+            centre = avg_vec3s(bp.points)
+            for point in bp.points:
+                point -= centre
+
     def draw(self, screen: Surface, global_offset: Vector3):
         global_pos = global_offset + self.body.parent_offset
         for child in self.body.children:
