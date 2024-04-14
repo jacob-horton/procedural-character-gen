@@ -28,17 +28,22 @@ def make_points(n: int, initial_distance: int):
     return point_list
 
 class BodyPart:
-    def __init__(self, points: list[Vector3], parent_offset: Vector3):
+    def __init__(self, points: list[Vector3], parent_offset: Vector3, color: pygame.Color | None = None):
         self.children: list['BodyPart'] = []
         self.points = points
         self.parent_offset = parent_offset
+
+        if color is None:
+            color = pygame.Color(random.randrange(256), random.randrange(256), random.randrange(256))
+        self.color = color
+
     
     def create_limb(self, point: Vector3):
         '''
         The limb will extend outwards equal to the offset of the point it was created from in that point.
         You can 
         '''
-        limb = Limb(point, [point])
+        limb = Limb(point, [point], color=self.color)
         self.children.append(limb)
         return limb
     
@@ -77,18 +82,17 @@ def avg_vec2s(vecs: list[Vector2]) -> Vector2:
     return sum / len(vecs)
 
 class Blob(BodyPart):
-    def __init__(self, parent_offset: Vector3, points: list[Vector3], growth_rate: float, repulsion: float, color: pygame.Color | None = None):
+    def __init__(self, parent_offset: Vector3, points: list[Vector3], growth_rate: float, repulsion: float):
         self.repulsion = repulsion
         self.growth_rate = growth_rate
         super().__init__(points, parent_offset)
 
-        if color is None:
-            color = pygame.Color(random.randrange(256), random.randrange(256), random.randrange(256))
-        self.color = color
-
     def draw(self, screen: pygame.Surface, global_offset: Vector3):
         print(f"I, {self}, am drawing!")
         global_pos = global_offset + self.parent_offset
+        for i in self.children:
+            i.draw(screen, global_pos)
+
         projected = [predefined_projection(p + global_pos) for p in self.points]
         hull = gift_wrap(projected)
 
@@ -102,12 +106,10 @@ class Blob(BodyPart):
                 triangle,
             )
 
-        for point in projected:
-            pygame.draw.circle(screen, "black", point, 5)
+        # for point in projected:
+        #     pygame.draw.circle(screen, "black", point, 5)
 
         Eye(avg_vec3s(self.points), 20).draw(screen, global_pos)
-        for i in self.children:
-            i.draw(screen, global_pos)
 
 
 class Creature: 
@@ -177,16 +179,33 @@ class Limb(BodyPart):
     Limbs are linear sequences of 3D vectors which are projected into the
     2D plane and rendered as segments (lines joining sequential points).
     '''
-    def __init__(self, parent_offset: Vector3, points: list[Vector3], thickness: int = 50):
+    def __init__(self, parent_offset: Vector3, points: list[Vector3], thickness: int = 50, color: pygame.Color | None = None):
         self.thickness = thickness
-        super().__init__(points, parent_offset)
+
+        super().__init__(points, parent_offset, color=color)
     
     def draw(self, screen: pygame.Surface, global_offset: Vector3):
         global_pos = global_offset+self.parent_offset
+
+        pygame.draw.circle(
+            screen,
+            self.color,
+            predefined_projection(self.parent_offset),
+            self.thickness / 2
+        )
+
+        pygame.draw.circle(
+            screen,
+            self.color,
+            predefined_projection(self.parent_offset+self.points[0]),
+            self.thickness / 2
+        )
+
         Segment(
             self.parent_offset, 
             self.parent_offset+self.points[0],
             self.thickness
-        ).draw(screen, global_offset)
+        ).draw(screen, global_offset, self.color)
+
         for i in self.children:
             i.draw(screen, global_pos)
