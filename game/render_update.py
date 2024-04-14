@@ -21,4 +21,4 @@ def render(screen: pygame.Surface, space: bool):
     gg.draw(screen, Vector3())
     if space:
         print("SPACE")
-        gg.grow()
+        [gg.grow() for _ in range(5)]

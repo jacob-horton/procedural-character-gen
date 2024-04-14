@@ -41,7 +41,6 @@ class Blob(BodyPart):
         parent.children.append(self)
 
     def draw(self, screen: pygame.Surface, global_offset: Vector3):
-        print(f"I, {self}, am drawing!")
         global_pos = global_offset + self.parent_offset
         for i in self.children:
             i.draw(screen, global_pos)

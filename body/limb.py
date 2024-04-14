@@ -3,6 +3,7 @@ import random
 
 import pygame
 from pygame import Vector3
+from algo.randpoints import distribute_points
 from body.body import BodyPart
 from algo.projection import predefined_projection
 from graphics.line import draw_line
@@ -37,11 +38,19 @@ class Limb(BodyPart):
         self,
         parent: BodyPart,
         parent_offset: Vector3,
+        # hyperparameters
         thickness: int = 50,
+        growth_rate: float = 1.05,
+        initial_length: float = 10,
+        angle_variation: float = 0.1,
         color: pygame.Color | None = None,
     ):
         self.thickness = thickness
-        super().__init__([parent_offset], parent_offset, color=color)
+        self.growth_rate = growth_rate
+
+        p = distribute_points(1, angle_variation)[0]
+        movement_vector = parent_offset.normalize() + p
+        super().__init__([movement_vector * initial_length], parent_offset, color=color)
         self.append_to(parent)
 
     def append_to(self, parent: BodyPart):
