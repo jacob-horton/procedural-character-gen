@@ -8,7 +8,7 @@ FPS = 30
 
 
 def background(screen: pygame.Surface):
-    screen.fill("white")
+    screen.fill(pygame.Color(220, 247, 255))
 
 
 def run(screen: pygame.Surface, clock: pygame.time.Clock, render: Callable[..., None]):
