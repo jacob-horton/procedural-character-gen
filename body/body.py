@@ -22,12 +22,7 @@ class BodyPart:
         self.points = points
         self.parent_offset = parent_offset
         self.eyes: list[Eye] = []
-
-        if color is None:
-            color = pygame.Color(
-                random.randrange(256), random.randrange(256), random.randrange(256)
-            )
-        self.color = color
+        self.color = pygame.Color([int(i) % 255 for i in self.gene.colour])
 
     def __repr__(self):
         return f"<{self.__class__} with {len(self.children)}>"

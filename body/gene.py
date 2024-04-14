@@ -47,10 +47,10 @@ class Gene:
     # limb hyperparams
     limb_growth_rate: float = norm(1.1, 0.02, 1, 2)
 
-    eye_on_blob_percent: float = norm(0.3, 0.05)
+    eye_on_blob_percent: float = norm(0.1, 0.05)
     eye_on_blob_attenuation: float = r_attenuation()
 
-    eye_on_limb_percent: float = norm(0.5, 0.5)
+    eye_on_limb_percent: float = norm(0.3, 0.5)
     eye_on_limb_attenuation: float = r_attenuation()
 
     eye_size: float = norm(20, 10, 5, 40)
@@ -59,6 +59,9 @@ class Gene:
     limb_on_limb_percent: float = norm(4, 2, 0, 100) / GROWSCALE
     limb_on_limb_attenuation: float = r_attenuation() * 0.6
 
+    colour = pygame.Vector3(
+        GEN_RANDOM.randrange(256), GEN_RANDOM.randrange(256), GEN_RANDOM.randrange(256)
+    )
     """
 
     blob_on_blob_percent: float
@@ -84,7 +87,13 @@ class Gene:
     """
 
     def copy(self):
-        return copy(self)
+        new_gene = copy(self)
+        new_gene.colour += pygame.Vector3(
+            GEN_RANDOM.random() * gauss(0, 50),
+            GEN_RANDOM.random() * gauss(0, 50),
+            GEN_RANDOM.random() * gauss(0, 50),
+        )
+        return new_gene
 
     def __repr__(self):
         return "\n".join([f" - {k} = {v}" for k, v in self.__dict__.items()])
