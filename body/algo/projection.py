@@ -7,12 +7,13 @@ from game.config import RESOLUTION
 NDArray = np.ndarray[float, np.dtype[Any]]
 
 def project_point(point: Vector3, transformation_matrix: NDArray) -> Vector2:
-    bottom = -100
-    up = 100
+    scale = 2
+    bottom = -100*scale
+    up = 100*scale
     left = bottom * RESOLUTION.x / RESOLUTION.y
     right = up * RESOLUTION.x / RESOLUTION.y
     near = 0
-    far = 200
+    far = 200*scale
 
 
     mid_x = (left + right) / 2
