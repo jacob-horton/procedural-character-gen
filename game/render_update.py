@@ -11,7 +11,13 @@ gg = body.Creature(Gene())
 body.Blob(gg.body.gene.copy(), gg.body, gg.body.parent_offset)
 
 
-def render(screen: pygame.Surface, space: bool):
+def render(screen: pygame.Surface, space: bool, reset: bool = False):
+    global gg
+
+    if reset:
+        gg = body.Creature(Gene())
+        body.Blob(gg.body.gene.copy(), gg.body, gg.body.parent_offset)
+
     gg.draw(screen, Vector3())
     if space:
         [gg.grow() for _ in range(GROWSCALE)]
