@@ -1,15 +1,17 @@
 import pygame
 from pygame import Vector3
 from body.algo.creature import Creature
+import random
 
 THICKNESS = 10
-DIFF = 50
 
 gg = Creature(seed=None)
-gg.create_blob(Vector3(-DIFF//2, 0, 0), n=20, growth_rate=10, repulsion=2)
-gg.create_blob(Vector3(DIFF//2, 0, 0), n=6, growth_rate=5, repulsion=-1)
+torso = gg.body.create_blob(Vector3(0, 0, 0), n=20, growth_rate=2, repulsion=2)
+neck = torso.create_limb(random.choice(torso.points))
+head = neck.create_blob(random.choice(neck.points), n=6, growth_rate=1, repulsion=1.5)
 
 def render(screen: pygame.Surface, space: bool):
-    gg.render(screen, Vector3())
+    gg.draw(screen, Vector3())
     if space:
+        print('SPACE')
         gg.grow()

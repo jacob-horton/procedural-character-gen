@@ -6,6 +6,58 @@ import pygame
 from body.algo.gift_wrapping import gift_wrap
 from body.algo.projection import predefined_projection
 from body.eye import Eye
+from body.segment import Segment
+
+SEED = None
+RANDOM_STATE = random.Random(SEED)
+
+# generate nodes close by randomly
+def make_points(n: int, initial_distance: int):
+    def mk_pt():
+        r: list[float] = []
+        for _ in range(3):
+            # from [-1, 1)
+            x = (RANDOM_STATE.random()*2-1)
+            # from [-10, 10)
+            x *= initial_distance
+            # offset to root +- 10
+            r.append(x)
+        return Vector3(r)
+    
+    point_list = [mk_pt() for _ in range(n)]
+    return point_list
+
+class BodyPart:
+    def __init__(self, points: list[Vector3], parent_offset: Vector3):
+        self.children: list['BodyPart'] = []
+        self.points = points
+        self.parent_offset = parent_offset
+    
+    def create_limb(self, point: Vector3):
+        '''
+        The limb will extend outwards equal to the offset of the point it was created from in that point.
+        You can 
+        '''
+        limb = Limb(point, [point])
+        self.children.append(limb)
+        return limb
+    
+    def create_blob(self, point: Vector3, n: int = 20, initial_distance: int = 10, growth_rate: float = 10, repulsion: float = 1):
+        '''
+        The parent point chosen becomes the offset for the child (as always).
+        The points that make up the blob are generated randomly (with initial_distance multiplier)
+        It will be grown by the root Creature according to its rate and repulsion.
+        '''
+        points = make_points(n, initial_distance)
+        blob = Blob(point, points, growth_rate, repulsion)
+        self.children.append(blob)
+        return blob
+    
+    def __repr__(self):
+        return f"<{self.__class__} with {len(self.children)}>"
+    
+    def draw(self, screen: pygame.Surface, global_offset: Vector3):
+        ...
 
 def avg_vec3s(vecs: list[Vector3]) -> Vector3:
     sum = Vector3()
@@ -24,19 +76,18 @@ def avg_vec2s(vecs: list[Vector2]) -> Vector2:
 
     return sum / len(vecs)
 
-class Blob:
+class Blob(BodyPart):
     def __init__(self, parent_offset: Vector3, points: list[Vector3], growth_rate: float, repulsion: float, color: pygame.Color | None = None):
-        self.parent_offset = parent_offset
-        self.points = points
         self.repulsion = repulsion
         self.growth_rate = growth_rate
+        super().__init__(points, parent_offset)
 
         if color is None:
             color = pygame.Color(random.randrange(256), random.randrange(256), random.randrange(256))
-
         self.color = color
 
     def draw(self, screen: pygame.Surface, global_offset: Vector3):
+        print(f"I, {self}, am drawing!")
         global_pos = global_offset + self.parent_offset
         projected = [predefined_projection(p + global_pos) for p in self.points]
         hull = gift_wrap(projected)
@@ -55,41 +106,29 @@ class Blob:
             pygame.draw.circle(screen, "black", point, 5)
 
         Eye(avg_vec3s(self.points), 20).draw(screen, global_pos)
+        for i in self.children:
+            i.draw(screen, global_pos)
 
 
-class Creature:
-    def __init__(self, seed: Any = None, parent_offset = Vector3()):
+class Creature: 
+    def __init__(self, seed: Any = None, parent_offset: Vector3 = Vector3()):
         self.SEED = seed
-        self.RANDOM_STATE = random.Random(self.SEED)
-        self.blobs: list[Blob] = []
-        self.parent_offset = parent_offset
-        self.color = pygame.Color(random.randrange(256), random.randrange(256), random.randrange(256))
-
-    def create_blob(self, parent_offset: Vector3, n: int = 20, initial_distance: int = 10, growth_rate: float = 10, repulsion: float = 1):
-        points = self.make_points(n, initial_distance)
-        self.blobs.append(Blob(parent_offset, points, growth_rate, repulsion, color=self.color + pygame.Color(random.randrange(50), random.randrange(50), random.randrange(50))))
-
-    # generate nodes close by randomly
-    def make_points(self, n: int, initial_distance: int):
-        def mk_pt():
-            r: list[float] = []
-            for _ in range(3):
-                # from [-1, 1)
-                x = (self.RANDOM_STATE.random()*2-1)
-                # from [-10, 10)
-                x *= initial_distance
-                # offset to root +- 10
-                r.append(x)
-
-            return Vector3(r)
-        
-        point_list = [mk_pt() for _ in range(n)]
-        return point_list
+        self.body = BodyPart([Vector3()], parent_offset)
 
     def grow(self):
-        # Loop through all blobs to grow them
-        for blob in self.blobs:
-            for point in blob.points:
+        # Flatten hierarchy.
+        all_children: list[BodyPart] = []
+        def helper(child_list: list[BodyPart]):
+            for i in child_list:
+                all_children.append(i)
+                helper(i.children)
+        helper(self.body.children)
+
+        print(all_children)
+        for bp in all_children:
+            if not isinstance(bp, Blob):
+                continue
+            for point in bp.points:
                 '''
                 Each of the nodes can be considered a vector from (0,0,0), which is the root node.
                 We can increase the magnitude of this vector to make them further away, so we do this each step with mods:
@@ -100,12 +139,13 @@ class Creature:
                 3. Hope that translates well.
                 '''
                 # move further
-                movement_vec = point + blob.parent_offset
+                movement_vec = point + bp.parent_offset
                 # find the vector from this to the nearest neighbouring node
                 nearest_neighbour_vector = None
-                for other_blob in self.blobs:
-                    for n in other_blob.points:
-                        neighbour = n + other_blob.parent_offset
+                for other in all_children:
+                    for n in other.points:
+                        neighbour = n + other.parent_offset
+                        # are we comparing point with offset to neighbour with same offset here?
                         if point == neighbour: continue
 
                         if nearest_neighbour_vector is None:
@@ -120,9 +160,29 @@ class Creature:
                     raise Exception("nearest neighbour was none")
 
                 # add the movement vector to a weighted nearest neighbour vector (nnv)
-                movement_vec += nearest_neighbour_vector * blob.repulsion
-                point += movement_vec.normalize() * blob.growth_rate
+                movement_vec += nearest_neighbour_vector * bp.repulsion
+                point += movement_vec.normalize() * bp.growth_rate
 
-    def render(self, screen: Surface, global_offset: Vector3):
-        for blob in self.blobs:
-            blob.draw(screen, global_offset + self.parent_offset)
+    def draw(self, screen: Surface, global_offset: Vector3):
+        global_pos = global_offset + self.body.parent_offset
+        for child in self.body.children:
+            child.draw(screen, global_pos)
+
+class Limb(BodyPart):
+    '''
+    Limbs are linear sequences of 3D vectors which are projected into the
+    2D plane and rendered as segments (lines joining sequential points).
+    '''
+    def __init__(self, parent_offset: Vector3, points: list[Vector3], thickness: int = 50):
+        self.thickness = thickness
+        super().__init__(points, parent_offset)
+    
+    def draw(self, screen: pygame.Surface, global_offset: Vector3):
+        global_pos = global_offset+self.parent_offset
+        Segment(
+            self.parent_offset, 
+            self.parent_offset+self.points[0],
+            self.thickness
+        ).draw(screen, global_offset)
+        for i in self.children:
+            i.draw(screen, global_pos)
