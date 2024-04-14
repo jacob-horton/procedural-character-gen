@@ -1,4 +1,5 @@
 import random
+from numpy import copy
 from pygame import Vector3
 import pygame
 
@@ -52,7 +53,7 @@ class Blob(BodyPart):
         """
         for point in self.points:
             # move further
-            movement_vec = point + self.parent_offset
+            movement_vec = point.copy()
             # find the vector from this to the nearest neighbouring node
             nearest_neighbour_vector = None
             for other, depth in all_children:

@@ -67,19 +67,14 @@ def run_presentation(
             ROT.x += 5
         if pygame.key.get_pressed()[pygame.K_MINUS]:
             ZOOM *= 1.05
-            print("a", ZOOM)
         if pygame.key.get_pressed()[pygame.K_EQUALS]:
             ZOOM /= 1.05
-            print("a", ZOOM)
 
         reset = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    # TODO: reset
-                    pass
                 if event.key == pygame.K_RETURN:
                     interval = 3
                 if event.key == pygame.K_SPACE:
