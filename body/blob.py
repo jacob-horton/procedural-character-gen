@@ -24,8 +24,6 @@ class Blob(BodyPart):
         gene: Gene,
         parent: BodyPart,
         parent_offset: Vector3,
-        n: int = 10,
-        initial_distance: int = 10,
         growth_rate: float = 2,
     ):
         # hyperparameters

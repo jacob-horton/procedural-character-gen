@@ -30,7 +30,7 @@ class Creature:
             if part == "Limb":
                 Limb(bp.gene.copy(), bp, pt)
             elif part == "Blob":
-                pass
+                Blob(bp.gene.copy(), bp, pt)
 
     def draw(self, screen: Surface, global_offset: Vector3):
         global_pos = global_offset + self.body.parent_offset

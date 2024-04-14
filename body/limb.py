@@ -4,10 +4,11 @@ import random
 import pygame
 from pygame import Vector3
 from algo.randpoints import distribute_points
-from body.body import BodyPart
+from body.body import BodyPart, NewPart
 from algo.projection import predefined_projection
 from body.gene import Gene
 from graphics.line import draw_line
+import body.gene as gene
 
 
 @dataclass
@@ -64,7 +65,13 @@ class Limb(BodyPart):
 
     def grow(self, depth, all_children):
         self.points[0] *= self.growth_rate
-        self.growth_rate = 1 + ((self.growth_rate - 1) * 0.99)
+        self.growth_rate = 1 + ((self.growth_rate - 1) * 0.95)
+        # spawn blob
+        chance = (
+            self.gene.blob_on_limb_percent * self.gene.blob_on_limb_attenuation**depth
+        )
+        if gene.RANDOM.random() * 100 < chance:
+            return NewPart("Blob", self.points[0])
 
     def draw_self(self, screen: pygame.Surface, global_offset: Vector3):
         global_pos = global_offset + self.parent_offset

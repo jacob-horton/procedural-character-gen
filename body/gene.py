@@ -11,12 +11,12 @@ from copy import copy
 
 SEED = None
 RANDOM = random.Random(SEED)
-
+GROWSCALE = 5
 
 r_attenuation = lambda: RANDOM.random()
 
 
-def norm(mean=1, sd=1, low=0, upp=100):
+def norm(mean: float = 1, sd: float = 1, low=0, upp=100):
     r = low - 1
     while r < low or r > upp:
         r = random.gauss(mean, sd)
@@ -27,18 +27,18 @@ def norm(mean=1, sd=1, low=0, upp=100):
 class Gene:
 
     # blob -> limb
-    limb_on_blob_percent: float = norm(1, 1, 0, 100)
+    limb_on_blob_percent: float = norm(20, 10, 0, 100) / GROWSCALE
     limb_on_blob_attenuation: float = r_attenuation()
     # blob hyperparams
     blob_initial_randomness: float = RANDOM.gauss(10, 5)
     blob_repulsion: float = RANDOM.gauss(1, 0.1)
-    blob_node_count: int = round(RANDOM.gauss(15, 1))
+    blob_node_count: int = round(norm(15, 2, 5, 30))
 
     # limb -> blob
-    blob_on_limb_percent: float = norm(10, 1, 0, 100)
+    blob_on_limb_percent: float = norm(20, 10, 0, 100) / GROWSCALE
     blob_on_limb_attenuation: float = r_attenuation()
     # limb hyperparams
-    limb_growth_rate: float = RANDOM.gauss(1, 0.1)
+    limb_growth_rate: float = norm(1, 0.02, 1, 2)
     """
     limb_on_limb_percent: float
     limb_on_limb_attempts: int  # Number of attempts to add a limb to the end of another (can have multiple branch off)
