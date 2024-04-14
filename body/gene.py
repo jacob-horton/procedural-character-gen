@@ -13,7 +13,7 @@ SEED = None
 RANDOM = random.Random(SEED)
 GROWSCALE = 5
 
-r_attenuation = lambda: RANDOM.random()
+r_attenuation = lambda: RANDOM.random() * 0.8
 
 
 def norm(mean: float = 1, sd: float = 1, low=0, upp=100):
@@ -39,6 +39,16 @@ class Gene:
     blob_on_limb_attenuation: float = r_attenuation()
     # limb hyperparams
     limb_growth_rate: float = norm(1, 0.02, 1, 2)
+
+    eye_on_blob_percent: float = norm(0.3, 0.05)
+    eye_on_blob_attenuation: float = r_attenuation()
+
+    eye_on_limb_percent: float = norm(0.5, 0.5)
+    eye_on_limb_attenuation: float = r_attenuation()
+
+    eye_size: float = norm(15, 5, 5, 40)
+    eye_size_variation: float = norm(5, 1, 0, 15)
+
     """
     limb_on_limb_percent: float
     limb_on_limb_attempts: int  # Number of attempts to add a limb to the end of another (can have multiple branch off)
@@ -46,15 +56,6 @@ class Gene:
 
     blob_on_blob_percent: float
     blob_on_blob_attenuation: float
-
-    eye_on_blob_percent: float
-    eye_on_blob_attenuation: float
-
-    eye_on_limb_percent: float
-    eye_on_limb_attenuation: float
-
-    eye_size: float
-    eye_size_variation: float
 
     limb_length_variation: float
     limb_length_attenuation: float

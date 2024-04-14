@@ -4,6 +4,7 @@ import pygame
 from pygame import Vector3
 
 from algo.projection import predefined_projection_depth
+from body.eye import Eye
 from body.gene import Gene
 
 SEED = None
@@ -23,6 +24,7 @@ class BodyPart:
         self.children: list["BodyPart"] = []
         self.points = points
         self.parent_offset = parent_offset
+        self.eyes: list[Eye] = []
 
         if color is None:
             color = pygame.Color(
@@ -45,9 +47,14 @@ class BodyPart:
         render_items: list[Any] = [(depth, self)]
 
         for child in self.children:
-            child_global_pos = global_pos + child.parent_offset
-            child_depth = predefined_projection_depth(child_global_pos)
-            render_items.append((child_depth, child))
+            eye_global_pos = global_pos + child.parent_offset
+            eye_depth = predefined_projection_depth(eye_global_pos)
+            render_items.append((eye_depth, child))
+
+        for eye in self.eyes:
+            eye_global_pos = global_pos + eye.parent_offset
+            eye_depth = predefined_projection_depth(eye_global_pos)
+            render_items.append((eye_depth, eye))
 
         # Sort by depth, then render
         render_items.sort(key=lambda x: x[0])

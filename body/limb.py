@@ -6,6 +6,7 @@ from pygame import Vector3
 from algo.randpoints import distribute_points
 from body.body import BodyPart, NewPart
 from algo.projection import predefined_projection
+from body.eye import Eye
 from body.gene import Gene
 from graphics.line import draw_line
 import body.gene as gene
@@ -72,6 +73,28 @@ class Limb(BodyPart):
         )
         if gene.RANDOM.random() * 100 < chance:
             return NewPart("Blob", self.points[0])
+
+        for point in self.points:
+            chance = (
+                self.gene.limb_on_blob_percent
+                * self.gene.limb_on_blob_attenuation**depth
+            ) / len(self.points)
+            if gene.RANDOM.random() * 100 < chance:
+                return NewPart("Limb", point)
+
+            if (
+                gene.RANDOM.random() * 100
+                < self.gene.eye_on_limb_percent
+                * self.gene.eye_on_limb_attenuation**depth
+            ):
+                if any([e.parent_offset == point for e in self.eyes]):
+                    continue
+
+                size = (
+                    self.gene.eye_size
+                    + self.gene.eye_size_variation * gene.RANDOM.random()
+                )
+                self.eyes.append(Eye(point, size))
 
     def draw_self(self, screen: pygame.Surface, global_offset: Vector3):
         global_pos = global_offset + self.parent_offset

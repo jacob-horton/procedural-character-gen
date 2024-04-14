@@ -93,6 +93,21 @@ class Blob(BodyPart):
             if gene.RANDOM.random() * 100 < chance:
                 return NewPart("Limb", point)
 
+            if (
+                gene.RANDOM.random() * 100
+                < self.gene.eye_on_blob_percent
+                * self.gene.eye_on_blob_attenuation**depth
+            ):
+                # Don't spawn eye if there's already one there
+                if any([e.parent_offset == point for e in self.eyes]):
+                    continue
+
+                size = (
+                    self.gene.eye_size
+                    + self.gene.eye_size_variation * gene.RANDOM.random()
+                )
+                self.eyes.append(Eye(point, size))
+
     def draw_self(self, screen: pygame.Surface, global_offset: Vector3):
         global_pos = global_offset + self.parent_offset
         projected = [predefined_projection(p + global_pos) for p in self.points]
@@ -107,8 +122,3 @@ class Blob(BodyPart):
                 self.color + pygame.Color(i * 10, i * 10, i * 10),
                 triangle,
             )
-
-        # for point in projected:
-        #     pygame.draw.circle(screen, "black", point, 5)
-
-        Eye(avg_vec3s(self.points), 20).draw(screen, global_pos)
