@@ -10,6 +10,7 @@ import pygame
 
 @dataclass
 class Gene:
+    # blob->limb locus
     limb_on_blob_percent: float
     limb_on_blob_attenuation: float
 

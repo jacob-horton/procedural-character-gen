@@ -5,9 +5,11 @@ import random
 
 THICKNESS = 10
 
-gg = body.Creature(seed=None)
-torso = body.Blob(gg.body, Vector3())
+gg = body.Creature()
+torso = body.Blob(gg.body, Vector3(), growth_rate=1.5)
 neck = body.Limb(torso, random.choice(torso.points))
+joint = body.Limb(neck, neck.points[0], angle_variation=1)
+head = body.Blob(joint, joint.points[0])
 """
 torso = gg.body.create_blob(Vector3(0, 0, 0), n=20, growth_rate=2, repulsion=2)
 neck = torso.create_limb(random.choice(torso.points))

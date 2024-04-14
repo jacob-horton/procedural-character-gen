@@ -6,6 +6,7 @@ from pygame import Vector3
 from algo.randpoints import distribute_points
 from body.body import BodyPart
 from algo.projection import predefined_projection
+from body.gene import Gene
 from graphics.line import draw_line
 
 
@@ -36,6 +37,7 @@ class Limb(BodyPart):
 
     def __init__(
         self,
+        gene: Gene,
         parent: BodyPart,
         parent_offset: Vector3,
         # hyperparameters
@@ -50,11 +52,15 @@ class Limb(BodyPart):
 
         p = distribute_points(1, angle_variation)[0]
         movement_vector = parent_offset.normalize() + p
-        super().__init__([movement_vector * initial_length], parent_offset, color=color)
+        super().__init__(gene, [movement_vector * initial_length], parent_offset, color=color)
         self.append_to(parent)
 
     def append_to(self, parent: BodyPart):
         parent.children.append(self)
+
+    def grow(self, all_children):
+        self.points[0] *= self.growth_rate
+        self.growth_rate = 1 + ((self.growth_rate - 1) * 0.99)
 
     def draw(self, screen: pygame.Surface, global_offset: Vector3):
         global_pos = global_offset + self.parent_offset
