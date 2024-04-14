@@ -1,6 +1,8 @@
 import pygame
 from pygame import Vector2
 
+from algo.projection import ZOOM
+
 
 def draw_line(
     screen: pygame.Surface,
@@ -11,6 +13,7 @@ def draw_line(
     start_scale: float = 1.0,
     end_scale: float = 1.0,
 ):
+    width = width / ZOOM.x * 3
     perp = (end - start).normalize().rotate(90)
     ws = width * start_scale
     we = width * end_scale

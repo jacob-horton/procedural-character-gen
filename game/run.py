@@ -1,9 +1,8 @@
 # code game loops and render stuff
 from typing import Callable
 import pygame
-from pygame import Vector3
 
-from algo.projection import ROT
+from algo.projection import ROT, ZOOM
 
 FPS = 30
 
@@ -45,15 +44,19 @@ def run(screen: pygame.Surface, clock: pygame.time.Clock, render: Callable[..., 
 def run_presentation(
     screen: pygame.Surface, clock: pygame.time.Clock, render: Callable[..., None]
 ):
+    global ZOOM
+    global ROT
+
     running = True
     interval = 30
     paused = False
+    n_grown = 0
+    n_cap = 150
     i = 0
 
     while running:
         # poll for events
         # pygame.QUIT event means the user clicked X to close your window
-        space = False
         if pygame.key.get_pressed()[pygame.K_LEFT]:
             ROT.y -= 5
         if pygame.key.get_pressed()[pygame.K_RIGHT]:
@@ -62,6 +65,12 @@ def run_presentation(
             ROT.x -= 5
         if pygame.key.get_pressed()[pygame.K_UP]:
             ROT.x += 5
+        if pygame.key.get_pressed()[pygame.K_MINUS]:
+            ZOOM *= 1.05
+            print("a", ZOOM)
+        if pygame.key.get_pressed()[pygame.K_EQUALS]:
+            ZOOM /= 1.05
+            print("a", ZOOM)
 
         reset = False
         for event in pygame.event.get():
@@ -76,6 +85,7 @@ def run_presentation(
                 if event.key == pygame.K_SPACE:
                     # Reset creature
                     reset = True
+                    n_grown = 0
                 if event.key == pygame.K_r:
                     # Reset camera angle
                     ROT.scale_to_length(0)
@@ -86,7 +96,12 @@ def run_presentation(
                     interval = 30
 
         background(screen)
-        render(screen, i % interval == 0 and not paused, reset)
+
+        grow = i % interval == 0 and not paused and n_grown < n_cap
+        if grow:
+            n_grown += 1
+
+        render(screen, grow, reset)
 
         pygame.display.flip()
         clock.tick(FPS)

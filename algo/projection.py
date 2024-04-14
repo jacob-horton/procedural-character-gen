@@ -6,17 +6,18 @@ from game.config import RESOLUTION
 
 NDArray = np.ndarray[float, np.dtype[Any]]
 
+# TODO: class for these values (zoom should be single float)
 ROT = Vector3(20, 45, 0)
+ZOOM = Vector3(1, 1, 1) * 3.0
 
 
 def project_point(point: Vector3, transformation_matrix: NDArray) -> Vector3:
-    scale = 2
-    bottom = -100 * scale
-    up = 100 * scale
+    bottom = -100 * ZOOM.y
+    up = 100 * ZOOM.y
     left = bottom * RESOLUTION.x / RESOLUTION.y
     right = up * RESOLUTION.x / RESOLUTION.y
     near = 0
-    far = 200 * scale
+    far = 200 * ZOOM.x
 
     mid_x = (left + right) / 2
     mid_y = (bottom + up) / 2

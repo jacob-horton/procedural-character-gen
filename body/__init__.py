@@ -27,9 +27,16 @@ class Creature:
             if r is None:
                 continue
             part, pt = r
-            if part == "Limb":
+
+            # TODO: also check eyes
+            # Max 3 limbs per joint
+            if (
+                part == "Limb"
+                and len(bp.children) < 3
+                and all([isinstance(x, Limb) for x in bp.children])
+            ):
                 Limb(bp.gene.copy(), bp, pt)
-            elif part == "Blob":
+            elif part == "Blob" and len(bp.children) == 0:
                 Blob(bp.gene.copy(), bp, pt)
 
     def draw(self, screen: Surface, global_offset: Vector3):

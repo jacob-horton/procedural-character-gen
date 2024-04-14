@@ -5,7 +5,7 @@ import pygame
 from pygame import Vector3
 from algo.randpoints import distribute_points
 from body.body import BodyPart, NewPart
-from algo.projection import predefined_projection
+from algo.projection import ZOOM, predefined_projection
 from body.eye import Eye
 from body.gene import Gene
 from graphics.line import draw_line
@@ -45,7 +45,7 @@ class Limb(BodyPart):
         # hyperparameters
         thickness: int = 50,
         initial_length: float = 10,
-        angle_variation: float = 0.1,
+        angle_variation: float = 1.0,
         color: pygame.Color | None = None,
     ):
         self.thickness = thickness
@@ -76,8 +76,8 @@ class Limb(BodyPart):
 
         for point in self.points:
             chance = (
-                self.gene.limb_on_blob_percent
-                * self.gene.limb_on_blob_attenuation**depth
+                self.gene.limb_on_limb_percent
+                * self.gene.limb_on_limb_attenuation**depth
             ) / len(self.points)
             if gene.RANDOM.random() * 100 < chance:
                 return NewPart("Limb", point)
@@ -104,4 +104,5 @@ class Limb(BodyPart):
             predefined_projection(global_pos),
             predefined_projection(global_pos + self.points[0]),
             self.thickness,
+            end_scale=0.8,
         )
