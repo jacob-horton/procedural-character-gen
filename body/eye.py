@@ -3,7 +3,7 @@ import pygame
 from pygame import Vector2, Vector3
 from body.gene import ENV_RANDOM as random
 
-from algo.projection import ZOOM, predefined_projection
+from algo.projection import CAMERA, predefined_projection
 
 
 @dataclass
@@ -13,7 +13,7 @@ class Eye:
 
     def draw(self, screen: pygame.Surface, global_offset: Vector3):
         projected = predefined_projection(self.parent_offset + global_offset)
-        radius = self.radius / ZOOM.x * 3
+        radius = self.radius / CAMERA.zoom * 3
 
         pygame.draw.circle(screen, "white", projected, radius)
 

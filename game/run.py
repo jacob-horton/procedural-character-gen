@@ -3,7 +3,7 @@ from typing import Callable
 import pygame
 
 from body.gene import ENV_SEED, GEN_SEED
-from algo.projection import ROT, ZOOM
+from algo.projection import CAMERA
 
 FPS = 30
 
@@ -25,13 +25,13 @@ def run(screen: pygame.Surface, clock: pygame.time.Clock, render: Callable[..., 
                 if event.key == pygame.K_SPACE:
                     space = True
                 if event.key == pygame.K_UP:
-                    ROT.x += 20
+                    CAMERA.rot.x += 20
                 if event.key == pygame.K_DOWN:
-                    ROT.x -= 20
+                    CAMERA.rot.x -= 20
                 if event.key == pygame.K_RIGHT:
-                    ROT.y += 20
+                    CAMERA.rot.y += 20
                 if event.key == pygame.K_LEFT:
-                    ROT.y -= 20
+                    CAMERA.rot.y -= 20
 
         background(screen)
         render(screen, space)
@@ -45,9 +45,6 @@ def run(screen: pygame.Surface, clock: pygame.time.Clock, render: Callable[..., 
 def run_presentation(
     screen: pygame.Surface, clock: pygame.time.Clock, render: Callable[..., None]
 ):
-    global ZOOM
-    global ROT
-
     running = True
     interval = 30
     paused = False
@@ -59,17 +56,17 @@ def run_presentation(
         # poll for events
         # pygame.QUIT event means the user clicked X to close your window
         if pygame.key.get_pressed()[pygame.K_LEFT]:
-            ROT.y -= 5
+            CAMERA.rot.y -= 5
         if pygame.key.get_pressed()[pygame.K_RIGHT]:
-            ROT.y += 5
+            CAMERA.rot.y += 5
         if pygame.key.get_pressed()[pygame.K_DOWN]:
-            ROT.x -= 5
+            CAMERA.rot.x -= 5
         if pygame.key.get_pressed()[pygame.K_UP]:
-            ROT.x += 5
+            CAMERA.rot.x += 5
         if pygame.key.get_pressed()[pygame.K_MINUS]:
-            ZOOM *= 1.05
+            CAMERA.zoom *= 1.05
         if pygame.key.get_pressed()[pygame.K_EQUALS]:
-            ZOOM /= 1.05
+            CAMERA.zoom /= 1.05
 
         reset = False
         for event in pygame.event.get():
@@ -85,7 +82,7 @@ def run_presentation(
                     n_grown = 0
                 if event.key == pygame.K_r:
                     # Reset camera angle
-                    ROT.scale_to_length(0)
+                    CAMERA.rot.scale_to_length(0)
                 if event.key == pygame.K_p:
                     paused = not paused
             elif event.type == pygame.KEYUP:

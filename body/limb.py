@@ -4,7 +4,7 @@ import pygame
 from pygame import Vector3
 from algo.randpoints import distribute_points
 from body.body import BodyPart, NewPart
-from algo.projection import ZOOM, predefined_projection
+from algo.projection import predefined_projection
 from body.eye import Eye
 from body.gene import Gene
 from graphics.line import draw_line

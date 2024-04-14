@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import numpy as np
 from typing import Any
 from pygame import Vector2, Vector3
@@ -6,18 +7,28 @@ from game.config import RESOLUTION
 
 NDArray = np.ndarray[float, np.dtype[Any]]
 
-# TODO: class for these values (zoom should be single float)
-ROT = Vector3(20, 45, 0)
-ZOOM = Vector3(1, 1, 1) * 3.0
+
+@dataclass
+class Camera:
+    rot: Vector3
+    zoom: float
+    translation: Vector3
+
+
+CAMERA = Camera(
+    rot=Vector3(20, 45, 0),
+    zoom=3.0,
+    translation=Vector3(),
+)
 
 
 def project_point(point: Vector3, transformation_matrix: NDArray) -> Vector3:
-    bottom = -100 * ZOOM.y
-    up = 100 * ZOOM.y
+    bottom = -100 * CAMERA.zoom
+    up = 100 * CAMERA.zoom
     left = bottom * RESOLUTION.x / RESOLUTION.y
     right = up * RESOLUTION.x / RESOLUTION.y
     near = 0
-    far = 200 * ZOOM.x
+    far = 200 * CAMERA.zoom
 
     mid_x = (left + right) / 2
     mid_y = (bottom + up) / 2
@@ -124,13 +135,13 @@ def generate_transformation_matrix(
 
 def predefined_projection(point: Vector3) -> Vector2:
     predefined_transform_matrix = generate_transformation_matrix(
-        1, ROT * np.pi / 180, Vector3()
+        1, CAMERA.rot * np.pi / 180, Vector3()
     )
     return to_screen_space(project_point(point, predefined_transform_matrix))
 
 
 def predefined_projection_depth(point: Vector3) -> float:
     predefined_transform_matrix = generate_transformation_matrix(
-        1, ROT * np.pi / 180, Vector3()
+        1, CAMERA.rot * np.pi / 180, Vector3()
     )
     return project_point(point, predefined_transform_matrix).z
