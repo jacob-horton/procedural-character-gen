@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-import random
 import pygame
 from pygame import Vector2, Vector3
+from body.gene import ENV_RANDOM as random
 
 from algo.projection import ZOOM, predefined_projection
 

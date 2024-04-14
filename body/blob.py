@@ -1,4 +1,3 @@
-import random
 from numpy import copy
 from pygame import Vector3
 import pygame
@@ -34,7 +33,6 @@ class Blob(BodyPart):
         self.initial_distance = gene.blob_initial_randomness
         # rendering
         points = distribute_points(self.n, self.initial_distance)
-        self.parent_offset = random.choice(parent.points)
         self.append_to(parent)
         super().__init__(gene, points, parent_offset)
 
@@ -91,11 +89,11 @@ class Blob(BodyPart):
                 self.gene.limb_on_blob_percent
                 * self.gene.limb_on_blob_attenuation**depth
             ) / len(self.points)
-            if gene.RANDOM.random() * 100 < chance:
+            if gene.GEN_RANDOM.random() * 100 < chance:
                 return NewPart("Limb", point)
 
             if (
-                gene.RANDOM.random() * 100
+                gene.GEN_RANDOM.random() * 100
                 < self.gene.eye_on_blob_percent
                 * self.gene.eye_on_blob_attenuation**depth
             ):
@@ -105,7 +103,7 @@ class Blob(BodyPart):
 
                 size = (
                     self.gene.eye_size
-                    + self.gene.eye_size_variation * gene.RANDOM.random()
+                    + self.gene.eye_size_variation * gene.GEN_RANDOM.random()
                 )
                 self.eyes.append(Eye(point, size))
 

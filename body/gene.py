@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 import pygame
-import random
+import random, sys
 from copy import copy
 
 # Attenuation
@@ -9,17 +9,23 @@ from copy import copy
 # <1 = decrease probability with depth
 # >1 = increase probability with depth
 
-SEED = None
-RANDOM = random.Random(SEED)
+# the genetic determinance affects whether events can happen or not
+GEN_SEED = random.randrange(sys.maxsize)
+GEN_RANDOM = random.Random(GEN_SEED)
+# the environmental determinance affects how likely events are to happen
+ENV_SEED = random.randrange(sys.maxsize)
+ENV_RANDOM = random.Random(ENV_SEED)
+# skip render cycles
 GROWSCALE = 5
 
-r_attenuation = lambda: RANDOM.random() * 0.85
+r_attenuation = lambda: ENV_RANDOM.random() * 0.85
+gauss = ENV_RANDOM.gauss
 
 
 def norm(mean: float = 1, sd: float = 1, low=0, upp=100):
     r = low - 1
     while r < low or r > upp:
-        r = random.gauss(mean, sd)
+        r = gauss(mean, sd)
     return r
 
 
@@ -30,13 +36,13 @@ class Gene:
     limb_on_blob_percent: float = norm(15, 10, 0, 100) / GROWSCALE
     limb_on_blob_attenuation: float = r_attenuation()
     # blob hyperparams
-    blob_initial_randomness: float = RANDOM.gauss(10, 5)
-    blob_repulsion: float = RANDOM.gauss(1, 0.1)
+    blob_initial_randomness: float = gauss(10, 5)
+    blob_repulsion: float = gauss(1, 0.1)
     blob_node_count: int = round(norm(15, 2, 5, 30))
 
     # limb -> blob
-    blob_on_limb_percent: float = norm(15, 10, 0, 100) / GROWSCALE
-    blob_on_limb_attenuation: float = r_attenuation()
+    blob_on_limb_percent: float = norm(50, 10, 0, 100) / GROWSCALE
+    blob_on_limb_attenuation: float = r_attenuation() / 0.85
 
     # limb hyperparams
     limb_growth_rate: float = norm(1.1, 0.02, 1, 2)
@@ -81,4 +87,4 @@ class Gene:
         return copy(self)
 
     def __repr__(self):
-        return "\n".join([f"{k} = {v}" for k, v in self.__dict__.items()])
+        return "\n".join([f" - {k} = {v}" for k, v in self.__dict__.items()])

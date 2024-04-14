@@ -1,14 +1,11 @@
-import random
 from typing import Any, Literal, NamedTuple
 import pygame
 from pygame import Vector3
-
 from algo.projection import predefined_projection_depth
 from body.eye import Eye
 from body.gene import Gene
+from body.gene import ENV_RANDOM as random
 
-SEED = None
-RANDOM_STATE = random.Random(SEED)
 NewPart = NamedTuple("NewPart", [("part", Literal["Limb", "Blob"]), ("point", Vector3)])
 
 

@@ -2,6 +2,7 @@
 from typing import Callable
 import pygame
 
+from body.gene import ENV_SEED, GEN_SEED
 from algo.projection import ROT, ZOOM
 
 FPS = 30
@@ -79,6 +80,7 @@ def run_presentation(
                     interval = 3
                 if event.key == pygame.K_SPACE:
                     # Reset creature
+                    print(f"That was {GEN_SEED=}, {ENV_SEED=}!")
                     reset = True
                     n_grown = 0
                 if event.key == pygame.K_r:

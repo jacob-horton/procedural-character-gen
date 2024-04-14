@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-import random
 
 import pygame
 from pygame import Vector3
@@ -71,7 +70,7 @@ class Limb(BodyPart):
         chance = (
             self.gene.blob_on_limb_percent * self.gene.blob_on_limb_attenuation**depth
         )
-        if gene.RANDOM.random() * 100 < chance:
+        if gene.GEN_RANDOM.random() * 100 < chance:
             return NewPart("Blob", self.points[0])
 
         for point in self.points:
@@ -79,11 +78,11 @@ class Limb(BodyPart):
                 self.gene.limb_on_limb_percent
                 * self.gene.limb_on_limb_attenuation**depth
             ) / len(self.points)
-            if gene.RANDOM.random() * 100 < chance:
+            if gene.GEN_RANDOM.random() * 100 < chance:
                 return NewPart("Limb", point)
 
             if (
-                gene.RANDOM.random() * 100
+                gene.GEN_RANDOM.random() * 100
                 < self.gene.eye_on_limb_percent
                 * self.gene.eye_on_limb_attenuation**depth
             ):
@@ -92,7 +91,7 @@ class Limb(BodyPart):
 
                 size = (
                     self.gene.eye_size
-                    + self.gene.eye_size_variation * gene.RANDOM.random()
+                    + self.gene.eye_size_variation * gene.GEN_RANDOM.random()
                 )
                 self.eyes.append(Eye(point, size))
 

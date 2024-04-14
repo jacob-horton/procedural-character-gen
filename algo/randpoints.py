@@ -1,14 +1,11 @@
 # generate nodes close by randomly
-import random
-
 from pygame import Vector3
+from body.gene import ENV_RANDOM
 
 
-def distribute_points(
-    n: int, initial_distance: float, random_state: random.Random = random.Random(None)
-):
+def distribute_points(n: int, initial_distance: float):
     mkpt = lambda: Vector3(
-        [(random_state.random() * 2 - 1) * initial_distance for _ in range(3)]
+        [(ENV_RANDOM.random() * 2 - 1) * initial_distance for _ in range(3)]
     )
     """'
     def make_point():

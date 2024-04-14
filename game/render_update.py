@@ -1,7 +1,6 @@
 import pygame
 from pygame import Vector3
 import body
-import random
 
 from body.gene import Gene, GROWSCALE
 
