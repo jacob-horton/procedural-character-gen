@@ -1,4 +1,5 @@
-from pygame import Vector2 
+from pygame import Vector2
+
 
 def get_top_most(points: list[Vector2]) -> Vector2:
     max_y = points[0].y
@@ -8,7 +9,6 @@ def get_top_most(points: list[Vector2]) -> Vector2:
         if point.y > max_y:
             max_y = point.y
             top_most = point
-
 
     return top_most
 
@@ -43,7 +43,7 @@ def gift_wrap(points: list[Vector2]) -> list[Vector2]:
         if max_point is None:
             print("UH OH")
             exit(1)
-            
+
         prev_diff = max_point - hull[-1]
         prev_diff /= prev_diff.magnitude()
 

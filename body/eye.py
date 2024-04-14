@@ -3,7 +3,7 @@ import random
 import pygame
 from pygame import Vector2, Vector3
 
-from body.algo.projection import predefined_projection
+from algo.projection import predefined_projection
 
 @dataclass
 class Eye:
