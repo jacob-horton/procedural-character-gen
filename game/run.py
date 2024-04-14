@@ -23,14 +23,14 @@ def run(screen: pygame.Surface, clock: pygame.time.Clock, render: Callable[..., 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     space = True
-                if event.key == pygame.K_DOWN:
-                    ROT.y += 20
                 if event.key == pygame.K_UP:
-                    ROT.y -= 20
-                if event.key == pygame.K_RIGHT:
                     ROT.x += 20
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_DOWN:
                     ROT.x -= 20
+                if event.key == pygame.K_RIGHT:
+                    ROT.y += 20
+                if event.key == pygame.K_LEFT:
+                    ROT.y -= 20
 
         background(screen)
         render(screen, space)

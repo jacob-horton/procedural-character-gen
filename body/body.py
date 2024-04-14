@@ -1,6 +1,5 @@
-from queue import PriorityQueue
 import random
-from typing import Literal, NamedTuple
+from typing import Any, Literal, NamedTuple
 import pygame
 from pygame import Vector3
 
@@ -9,7 +8,8 @@ from body.gene import Gene
 
 SEED = None
 RANDOM_STATE = random.Random(SEED)
-NewPart = NamedTuple('NewPart', [('part', Literal['Limb', 'Blob']), ('point', Vector3)])
+NewPart = NamedTuple("NewPart", [("part", Literal["Limb", "Blob"]), ("point", Vector3)])
+
 
 class BodyPart:
     def __init__(
@@ -42,19 +42,17 @@ class BodyPart:
     def draw(self, screen: pygame.Surface, global_offset: Vector3):
         global_pos = global_offset + self.parent_offset
         depth = predefined_projection_depth(global_pos)
-        queue = PriorityQueue()
-        queue.put((depth, self))
+        render_items: list[Any] = [(depth, self)]
 
-        for i in self.children:
-            child_global_pos = global_pos + i.parent_offset
+        for child in self.children:
+            child_global_pos = global_pos + child.parent_offset
             child_depth = predefined_projection_depth(child_global_pos)
-            queue.put((child_depth, i))
+            render_items.append((child_depth, child))
 
-        while queue.not_empty:
-            try:
-                item = queue.get(False)[1]
-            except:
-                break
+        # Sort by depth, then render
+        render_items.sort(key=lambda x: x[0])
+        while len(render_items) > 0:
+            item = render_items.pop()[1]
 
             if item is self:
                 self.draw_self(screen, global_offset)
