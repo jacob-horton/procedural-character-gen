@@ -42,23 +42,24 @@ class Limb(BodyPart):
         parent_offset: Vector3,
         # hyperparameters
         thickness: int = 50,
-        growth_rate: float = 1.05,
         initial_length: float = 10,
         angle_variation: float = 0.1,
         color: pygame.Color | None = None,
     ):
         self.thickness = thickness
-        self.growth_rate = growth_rate
+        self.growth_rate = gene.limb_growth_rate
 
         p = distribute_points(1, angle_variation)[0]
         movement_vector = parent_offset.normalize() + p
-        super().__init__(gene, [movement_vector * initial_length], parent_offset, color=color)
+        super().__init__(
+            gene, [movement_vector * initial_length], parent_offset, color=color
+        )
         self.append_to(parent)
 
     def append_to(self, parent: BodyPart):
         parent.children.append(self)
 
-    def grow(self, all_children):
+    def grow(self, depth, all_children):
         self.points[0] *= self.growth_rate
         self.growth_rate = 1 + ((self.growth_rate - 1) * 0.99)
 

@@ -6,7 +6,8 @@ from algo.avgvec import avg_vec2s, avg_vec3s
 from algo.gift_wrapping import gift_wrap
 from algo.projection import predefined_projection
 from algo.randpoints import distribute_points
-from body.body import BodyPart
+from body import gene
+from body.body import BodyPart, NewPart
 from body.eye import Eye
 from body.gene import Gene
 
@@ -26,13 +27,12 @@ class Blob(BodyPart):
         n: int = 10,
         initial_distance: int = 10,
         growth_rate: float = 2,
-        repulsion: float = 1,
     ):
         # hyperparameters
-        self.repulsion = repulsion
+        self.repulsion = gene.blob_repulsion
         self.growth_rate = growth_rate
-        self.n = n
-        self.initial_distance = initial_distance
+        self.n = gene.blob_node_count
+        self.initial_distance = gene.blob_initial_randomness
         # rendering
         points = distribute_points(self.n, self.initial_distance)
         self.parent_offset = random.choice(parent.points)
@@ -42,7 +42,7 @@ class Blob(BodyPart):
     def append_to(self, parent: BodyPart):
         parent.children.append(self)
 
-    def grow(self, all_children):
+    def grow(self, depth, all_children):
         """
         Each of the nodes can be considered a vector from (0,0,0), which is the root node.
         We can increase the magnitude of this vector to make them further away, so we do this each step with mods:
@@ -81,10 +81,19 @@ class Blob(BodyPart):
             # add the movement vector to a weighted nearest neighbour vector (nnv)
             movement_vec += nearest_neighbour_vector * self.repulsion
             point += movement_vec.normalize() * self.growth_rate
+        self.growth_rate = self.growth_rate * 0.97
 
         centre = avg_vec3s(self.points)
         for point in self.points:
+            # shift to offset
             point -= centre
+
+            chance = (
+                self.gene.limb_on_blob_percent
+                * self.gene.limb_on_blob_attenuation**depth
+            ) / len(self.points)
+            if gene.RANDOM.random() * 100 < chance:
+                return NewPart("Limb", point)
 
     def draw(self, screen: pygame.Surface, global_offset: Vector3):
         global_pos = global_offset + self.parent_offset

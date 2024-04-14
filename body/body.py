@@ -1,4 +1,5 @@
 import random
+from typing import Literal, NamedTuple
 import pygame
 from pygame import Vector3
 
@@ -6,7 +7,7 @@ from body.gene import Gene
 
 SEED = None
 RANDOM_STATE = random.Random(SEED)
-
+NewPart = NamedTuple('NewPart', [('part', Literal['Limb', 'Blob']), ('point', Vector3)])
 
 class BodyPart:
     def __init__(
@@ -27,11 +28,13 @@ class BodyPart:
             )
         self.color = color
 
-    def append_to(self, parent: "BodyPart"): ...
-
     def __repr__(self):
         return f"<{self.__class__} with {len(self.children)}>"
 
-    def grow(self, all_children: list[tuple["BodyPart", int]]): ...
+    def append_to(self, parent: "BodyPart"): ...
+
+    def grow(
+        self, depth: int, all_children: list[tuple["BodyPart", int]]
+    ) -> NewPart | None: ...
 
     def draw(self, screen: pygame.Surface, global_offset: Vector3): ...
