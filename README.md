@@ -4,6 +4,21 @@
 
 ![image](https://github.com/jacob-horton/procedural-character-gen/assets/50290314/73c91e6a-494d-4c61-a617-efa7b1f93918)
 
+# Have a Go Yourself!
+
+Requirements: `python3`, `pip`
+
+Clone the repo: `git clone https://github.com/jacob-horton/procedural-character-gen`
+
+Install dependencies `pip install -r requirements.txt`
+
+Run it: `python3 main.py`
+
+# Tweaking parameters
+
+Tweak any of the values in the `gene.py` file to produce different looking creatures!
+
+
 # Controls
 | Key | Action |
 | --- | ------ |
